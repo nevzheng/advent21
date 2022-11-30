@@ -1,8 +1,10 @@
+use itertools::Itertools;
+
 const WIDTH: usize = 5;
 const HEIGHT: usize = 5;
 type Calls = Vec<u32>;
-type Board = [[u32; WIDTH]; HEIGHT];
-type Marks = [[bool; WIDTH]; HEIGHT];
+type Board = Vec<Vec<u32>>;
+type Marks = Vec<Vec<bool>>;
 
 struct BingoBoard {
     board: Board,
@@ -10,10 +12,23 @@ struct BingoBoard {
     win: bool,
 }
 
-fn check_row(marks: &Marks, row_id: usize) -> bool {}
-fn check_col(marks: &Marks, row_id: usize) -> bool {}
-fn check_forward_slash(marks: &Marks) -> bool {}
-fn check_back_slash(marks: &Marks) -> bool {}
+fn check_row(marks: &Marks, row_id: usize) -> bool {
+    for j in 0..WIDTH {
+        if !marks[row_id][j] {
+            return false;
+        }
+    }
+    true
+}
+
+fn check_col(marks: &Marks, col_id: usize) -> bool {
+    for i in 0..HEIGHT {
+        if !marks[i][col_id] {
+            return false;
+        }
+    }
+    true
+}
 
 impl BingoBoard {
     fn call(&mut self, num: u32) {
@@ -26,9 +41,24 @@ impl BingoBoard {
         }
     }
 
-    fn check(&self) -> bool {}
+    fn check(&mut self) -> bool {
+        for i in 0..HEIGHT {
+            if check_row(&self.marks, i) {
+                self.win = true;
+                return true;
+            }
+        }
 
-    fn score(&self) -> u32 {
+        for j in 0..WIDTH {
+            if check_col(&self.marks, j) {
+                self.win = true;
+                return true;
+            }
+        }
+        false
+    }
+
+    fn score(&self, just_called: u32) -> u32 {
         let mut sum: u32 = 0;
         for i in 0..HEIGHT {
             for j in 0..WIDTH {
@@ -37,7 +67,15 @@ impl BingoBoard {
                 }
             }
         }
-        sum
+        just_called * sum
+    }
+
+    fn new(board: Board) -> BingoBoard {
+        BingoBoard {
+            board,
+            marks: vec![vec![false; 5]; 5],
+            win: false,
+        }
     }
 }
 
@@ -48,15 +86,34 @@ fn read_calls(csv_calls: &str) -> Calls {
         .collect()
 }
 
-fn read_input(input: &str) -> (Calls, Vec<BingoBoard>) {}
+fn read_rows(row: &str) -> Vec<u32> {
+    row.split_whitespace()
+        .filter_map(|x| x.parse::<u32>().ok())
+        .collect()
+}
+
+fn read_input(input: &str) -> Option<(Calls, Vec<BingoBoard>)> {
+    let mut lines = input.lines();
+
+    let calls = read_calls(lines.next()?);
+
+    let mut boards: Vec<BingoBoard> = Vec::new();
+
+    for chunk in &lines.into_iter().chunks(6) {
+        let b: Board = chunk.skip(1).map(read_rows).collect();
+        boards.push(BingoBoard::new(b));
+    }
+
+    Some((calls, boards))
+}
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let (calls, boards) = read_input(input);
+    let (calls, mut boards) = read_input(input)?;
     for c in calls {
-        for b in boards {
+        for b in &mut boards {
             b.call(c);
             if b.check() {
-                return Some(b.score());
+                return Some(b.score(c));
             }
         }
     }
@@ -64,12 +121,12 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let (calls, boards) = read_input(input);
+    let (calls, mut boards) = read_input(input)?;
     let n_boards = boards.len();
     let mut n_wins = 0;
 
     for c in calls {
-        for b in boards {
+        for b in &mut boards {
             // Skip processing boards that already won.
             if b.win {
                 continue;
@@ -78,7 +135,7 @@ pub fn part_two(input: &str) -> Option<u32> {
             if b.check() {
                 n_wins += 1;
                 if n_wins == n_boards {
-                    return Some(b.score());
+                    return Some(b.score(c));
                 }
             }
         }
@@ -100,12 +157,12 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = aoc::read_file("examples", 4);
-        assert_eq!(part_one(&input), None);
+        assert_eq!(part_one(&input), Some(4512));
     }
 
     #[test]
     fn test_part_two() {
         let input = aoc::read_file("examples", 4);
-        assert_eq!(part_two(&input), None);
+        assert_eq!(part_two(&input), Some(1924));
     }
 }

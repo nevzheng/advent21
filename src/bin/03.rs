@@ -11,12 +11,10 @@ fn most_common_bit(nums: &Vec<u32>, idx: usize) -> Option<u32> {
         }
     }
 
-    if n_ones == n_zeros {
-        None
-    } else if n_ones < n_zeros {
-        Some(0)
-    } else {
-        Some(1)
+    match Ord::cmp(&n_ones, &n_zeros) {
+        std::cmp::Ordering::Equal => None,
+        std::cmp::Ordering::Less => Some(0),
+        std::cmp::Ordering::Greater => Some(1),
     }
 }
 
@@ -37,8 +35,8 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(eps * gam)
 }
 
-fn find_oxygen_rating(nums: &Vec<u32>, width: usize) -> u32 {
-    let mut current_nums = nums.clone();
+fn find_oxygen_rating(nums: &[u32], width: usize) -> u32 {
+    let mut current_nums = nums.to_owned();
 
     for idx in (0..width).rev() {
         // oxygen uses 1 as tie_breaker
@@ -58,8 +56,8 @@ fn find_oxygen_rating(nums: &Vec<u32>, width: usize) -> u32 {
     *current_nums.first().unwrap()
 }
 
-fn find_scrubber_rating(nums: &Vec<u32>, width: usize) -> u32 {
-    let mut current_nums = nums.clone();
+fn find_scrubber_rating(nums: &[u32], width: usize) -> u32 {
+    let mut current_nums = nums.to_owned();
 
     for idx in (0..width).rev() {
         // scrubber uses 0 as tie breaker. we need to invert it though so use 1.
