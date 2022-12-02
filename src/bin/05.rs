@@ -3,8 +3,6 @@ use std::{
     convert::TryInto,
 };
 
-use itertools::equal;
-
 #[derive(Clone)]
 struct Point {
     x: isize,
@@ -37,18 +35,6 @@ fn read_segment(line: &str) -> Option<LineSegment> {
     let (p1, p2) = line.split_once(" -> ")?;
 
     Some(LineSegment::new(parse_point(p1)?, parse_point(p2)?))
-}
-
-fn ccw(a: &Point, b: &Point, c: &Point) -> bool {
-    (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x)
-}
-
-fn intersects_points(a: &Point, b: &Point, c: &Point, d: &Point) -> bool {
-    ccw(a, c, d) != ccw(b, c, d) && ccw(a, b, c) != ccw(a, b, d)
-}
-
-fn intersects(x: &LineSegment, y: &LineSegment) -> bool {
-    intersects_points(&x.a, &x.b, &y.a, &y.b)
 }
 
 pub fn part_one(input: &str) -> Option<isize> {
