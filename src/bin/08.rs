@@ -1,3 +1,23 @@
+#[macro_use]
+extern crate lazy_static;
+
+use std::collections::HashMap;
+
+lazy_static! {
+    static ref UNIQUE_LENGTH_DIGITS: HashMap<usize, usize> = {
+        let mut m = HashMap::new();
+        // Two segments is a "1".
+        m.insert(2, 1);
+        // Three Segments is a "7";
+        m.insert(3,7);
+        // Four Segments is a "4".
+        m.insert(4,4);
+        // Seven Segments is an "8".
+        m.insert(7,8);
+        m
+    };
+}
+
 fn read_input(input: &str) -> Vec<(Vec<&str>, Vec<&str>)> {
     // Split into lines.
     let lines: Vec<&str> = input.lines().collect();
@@ -18,13 +38,25 @@ fn read_input(input: &str) -> Vec<(Vec<&str>, Vec<&str>)> {
         .collect()
 }
 
-pub fn part_one(input: &str) -> Option<u32> {
+pub fn part_one(input: &str) -> Option<usize> {
     let inputs_outputs = read_input(input);
 
-    None
+    Some(
+        inputs_outputs
+            .iter()
+            .map(|(_, outputs)| {
+                outputs
+                    .iter()
+                    .filter_map(|digit| {
+                        UNIQUE_LENGTH_DIGITS.contains_key(&digit.len()).then_some(1)
+                    })
+                    .count()
+            })
+            .sum(),
+    )
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(input: &str) -> Option<usize> {
     None
 }
 
