@@ -8,4 +8,5 @@ default-run = "aoc"
 
 [dependencies]
 itertools = "*"
+lazy_static = "1.4.0"
 pico-args = "0.5.0"
