@@ -1,7 +1,4 @@
-use std::{
-    cmp::{max, min},
-    convert::TryInto,
-};
+use std::cmp::{max, min};
 
 #[derive(Clone)]
 struct Point {
@@ -50,32 +47,32 @@ pub fn part_one(input: &str) -> Option<isize> {
         max_y = max(max_y, s.b.y);
     }
 
-    let mut grid: Vec<Vec<_>> =
-        vec![vec![0; (max_y + 1).try_into().unwrap()]; (max_x + 1).try_into().unwrap()];
+    let mut grid: Vec<Vec<_>> = vec![vec![0; (max_y + 1) as usize]; (max_x + 1) as usize];
 
     for s in segments {
         // Consider only vertical and horizontal lines where  x1=x2 or y1=y2 for segment x1,y1 -> x2,y2
         if s.a.x == s.b.x {
             // Vertical Line
-            let start: usize = min(s.a.y, s.b.y).try_into().ok()?;
-            let end: usize = max(s.a.y, s.b.y).try_into().ok()?;
+            let start = min(s.a.y, s.b.y) as usize;
+            let end = max(s.a.y, s.b.y) as usize;
             for i in start..=end {
-                grid[TryInto::<usize>::try_into(s.a.x).ok()?][i] += 1;
+                grid[s.a.x as usize][i] += 1;
             }
         } else if s.a.y == s.b.y {
             // Horizontal Line
-            let start: usize = min(s.a.x, s.b.x).try_into().ok()?;
-            let end: usize = max(s.a.x, s.b.x).try_into().ok()?;
-            for i in start..=end {
-                grid[i][TryInto::<usize>::try_into(s.a.y).ok()?] += 1;
+            let start = min(s.a.x, s.b.x) as usize;
+            let end = max(s.a.x, s.b.x) as usize;
+
+            for v in grid.iter_mut().take(end + 1).skip(start) {
+                v[s.a.y as usize] += 1
             }
         }
     }
 
     let mut ans = 0;
-    for i in 0..=TryInto::<usize>::try_into(max_x).ok()? {
-        for j in 0..=(TryInto::<usize>::try_into(max_y).ok()?) {
-            if grid[i][j] >= 2 {
+    for row in grid.iter().take((max_x + 1) as usize) {
+        for col in row.iter().take((max_y + 1) as usize) {
+            if *col >= 2 {
                 ans += 1;
             }
         }
@@ -97,24 +94,23 @@ pub fn part_two(input: &str) -> Option<isize> {
         max_y = max(max_y, s.b.y);
     }
 
-    let mut grid: Vec<Vec<_>> =
-        vec![vec![0; (max_y + 1).try_into().unwrap()]; (max_x + 1).try_into().unwrap()];
+    let mut grid: Vec<Vec<_>> = vec![vec![0; (max_y + 1) as usize]; (max_x + 1) as usize];
 
     for s in segments {
         // Consider only vertical and horizontal lines where  x1=x2 or y1=y2 for segment x1,y1 -> x2,y2
         if s.a.x == s.b.x {
             // Vertical Line
-            let start: usize = min(s.a.y, s.b.y).try_into().ok()?;
-            let end: usize = max(s.a.y, s.b.y).try_into().ok()?;
+            let start = min(s.a.y, s.b.y) as usize;
+            let end = max(s.a.y, s.b.y) as usize;
             for i in start..=end {
-                grid[TryInto::<usize>::try_into(s.a.x).ok()?][i] += 1;
+                grid[s.a.x as usize][i] += 1;
             }
         } else if s.a.y == s.b.y {
             // Horizontal Line
-            let start: usize = min(s.a.x, s.b.x).try_into().ok()?;
-            let end: usize = max(s.a.x, s.b.x).try_into().ok()?;
-            for i in start..=end {
-                grid[i][TryInto::<usize>::try_into(s.a.y).ok()?] += 1;
+            let start = min(s.a.x, s.b.x) as usize;
+            let end = max(s.a.x, s.b.x) as usize;
+            for row in grid.iter_mut().take(end + 1).skip(start) {
+                row[s.a.y as usize] += 1;
             }
         } else {
             // 45 degree line
@@ -140,9 +136,9 @@ pub fn part_two(input: &str) -> Option<isize> {
     }
 
     let mut ans = 0;
-    for i in 0..=TryInto::<usize>::try_into(max_x).ok()? {
-        for j in 0..=(TryInto::<usize>::try_into(max_y).ok()?) {
-            if grid[i][j] >= 2 {
+    for row in grid.iter().take((max_x + 1) as usize) {
+        for col in row.iter().take((max_y + 1) as usize) {
+            if *col >= 2 {
                 ans += 1;
             }
         }
