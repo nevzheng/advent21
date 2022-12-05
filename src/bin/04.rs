@@ -22,12 +22,7 @@ fn check_row(marks: &Marks, row_id: usize) -> bool {
 }
 
 fn check_col(marks: &Marks, col_id: usize) -> bool {
-    for i in 0..HEIGHT {
-        if !marks[i][col_id] {
-            return false;
-        }
-    }
-    true
+    marks.iter().all(|v| v[col_id])
 }
 
 impl BingoBoard {
